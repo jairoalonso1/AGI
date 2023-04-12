@@ -9,6 +9,25 @@ from langchain.vectorstores.base import VectorStore
 from pydantic import BaseModel, Field
 import streamlit as st
 
+def apply_custom_css():
+    st.markdown(
+        """
+        <style>
+            body {
+                background-color: #ff9900;
+            }
+            .sidebar .sidebar-content {
+                background-color: #8B4513;
+                color: white;
+            }
+            h1, h2, h3, h4, h5, h6, p, label {
+                font-family: 'Roboto', sans-serif;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
 # Clases principales
 class TaskCreationChain(LLMChain):
     @classmethod
@@ -243,6 +262,10 @@ class BabyAGI(BaseModel):
         controller.add_task({"task_id": 1, "task_name": first_task})
         return controller
 
+def main():
+    apply_custom_css()
+    
+    
 # Función principal para iniciar el BabyAGI
 def main():
     # Configuración de Streamlit
