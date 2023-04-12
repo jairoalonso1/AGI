@@ -238,8 +238,8 @@ class BabyAGI(BaseModel):
         objective: str,
         first_task: str,
         verbose: bool = False,
-    ) -> "BabyAGI":
-        """Initialize the BabyAGI Controller."""
+    ) -> "AGI":
+        """Initialize the AGI Controller."""
         task_creation_chain = TaskCreationChain.from_llm(
             llm, objective, verbose=verbose
         )
@@ -261,7 +261,7 @@ def main():
     # Configuración de Streamlit
     st.set_page_config(
         initial_sidebar_state="expanded",
-        page_title="BabyAGI UI",
+        page_title="AGI UI",
         layout="centered",
     )
 
@@ -280,7 +280,6 @@ def main():
         )
 
     # UI principal
-    st.title("BabyAGI UI")
     objective = st.text_input("Input Ultimate goal", "Solve world hunger")
     first_task = st.text_input("Input Where to start", "Develop a task list")
     max_iterations = st.number_input("Max iterations", value=3, min_value=1, step=1)
