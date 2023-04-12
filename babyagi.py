@@ -1,3 +1,4 @@
+import databutton as db
 from collections import deque
 from typing import Dict, List, Optional
 from langchain import LLMChain, OpenAI, PromptTemplate
@@ -8,6 +9,7 @@ from langchain.vectorstores.base import VectorStore
 from pydantic import BaseModel, Field
 import streamlit as st
 
+# Clases principales
 class TaskCreationChain(LLMChain):
     @classmethod
     def from_llm(cls, llm: BaseLLM, objective: str, verbose: bool = True) -> LLMChain:
@@ -76,7 +78,6 @@ class TaskPrioritizationChain(LLMChain):
                 prioritized_task_list.append({"task_id": task_id, "task_name": task_name})
         return prioritized_task_list
 
-        
 class ExecutionChain(LLMChain):
     """Chain to execute tasks."""
     
@@ -130,6 +131,7 @@ class Message:
 
     def write(self, content):
         self.exp.markdown(content)
+
 
 
 class BabyAGI(BaseModel):
@@ -241,13 +243,16 @@ class BabyAGI(BaseModel):
         return controller
 
 
+# Función principal para iniciar el BabyAGI
 def main():
+    # Configuración de Streamlit
     st.set_page_config(
         initial_sidebar_state="expanded",
         page_title="BabyAGI UI",
         layout="centered",
     )
 
+    # Sidebar
     with st.sidebar:
         openai_api_key = st.text_input('Your OpenAI API KEY', type="password")
         model_name = st.selectbox("Model name", options=["gpt-3.5-turbo", "gpt-4", "text-davinci-003"])
@@ -259,15 +264,18 @@ def main():
             value=0.5,
         )
 
+    # UI principal
     st.title("BabyAGI UI")
     objective = st.text_input("Input Ultimate goal", "Solve world hunger")
     first_task = st.text_input("Input Where to start", "Develop a task list")
     max_iterations = st.number_input("Max iterations", value=3, min_value=1, step=1)
     button = st.button("Run")
 
+    # Creación de modelos
     embedding_model = HuggingFaceEmbeddings()
     vectorstore = FAISS.from_texts(["_"], embedding_model, metadatas=[{"task":first_task}])
 
+    # Ejecución del BabyAGI
     if button:
         try:
             baby_agi = BabyAGI.from_llm_and_objectives(
@@ -281,5 +289,6 @@ def main():
         except Exception as e:
             st.error(e)
 
+# Ejecución del programa
 if __name__ == "__main__":
     main()
