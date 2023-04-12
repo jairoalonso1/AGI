@@ -262,9 +262,6 @@ class BabyAGI(BaseModel):
         controller.add_task({"task_id": 1, "task_name": first_task})
         return controller
 
-def main():
-    apply_custom_css()
-    
     
 # Función principal para iniciar el BabyAGI
 def main():
@@ -274,6 +271,11 @@ def main():
         page_title="BabyAGI UI",
         layout="centered",
     )
+    
+    
+    def main():
+    apply_custom_css()
+    
 
     # Sidebar
     with st.sidebar:
