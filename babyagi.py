@@ -258,14 +258,14 @@ class BabyAGI(BaseModel):
 
     
 def main():
-    apply_custom_css()  # Agregue esta línea justo antes de la configuración de Streamlit
-
     # Configuración de Streamlit
     st.set_page_config(
         initial_sidebar_state="expanded",
         page_title="BabyAGI UI",
         layout="centered",
     )
+
+    apply_custom_css()
     
     # Sidebar
     with st.sidebar:
