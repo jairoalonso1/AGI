@@ -1,5 +1,5 @@
 <h1 align="center">
- babyagi-ui
+AGI
 
 </h1>
 
