@@ -1,3 +1,4 @@
+# Importación de librerías
 from collections import deque
 from typing import Dict, List, Optional
 from langchain import LLMChain, OpenAI, PromptTemplate
@@ -76,6 +77,7 @@ class TaskPrioritizationChain(LLMChain):
                 task_name = task_parts[1].strip()
                 prioritized_task_list.append({"task_id": task_id, "task_name": task_name})
         return prioritized_task_list
+
 
 class ExecutionChain(LLMChain):
     """Chain to execute tasks."""
@@ -240,7 +242,6 @@ class BabyAGI(BaseModel):
         )
         controller.add_task({"task_id": 1, "task_name": first_task})
         return controller
-
 
 # Función principal para iniciar el BabyAGI
 def main():
