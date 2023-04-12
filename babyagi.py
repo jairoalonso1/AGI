@@ -10,23 +10,17 @@ from pydantic import BaseModel, Field
 import streamlit as st
 
 def apply_custom_css():
-    st.markdown(
-        """
+    custom_css = """
         <style>
             body {
-                background-color: #ff9900;
+                background-color: #FFA500;
             }
             .sidebar .sidebar-content {
                 background-color: #8B4513;
-                color: white;
-            }
-            h1, h2, h3, h4, h5, h6, p, label {
-                font-family: 'Roboto', sans-serif;
             }
         </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    """
+    st.markdown(custom_css, unsafe_allow_html=True)
 
 # Clases principales
 class TaskCreationChain(LLMChain):
@@ -263,8 +257,9 @@ class BabyAGI(BaseModel):
         return controller
 
     
-# Función principal para iniciar el BabyAGI
 def main():
+    apply_custom_css()  # Agregue esta línea justo antes de la configuración de Streamlit
+
     # Configuración de Streamlit
     st.set_page_config(
         initial_sidebar_state="expanded",
@@ -272,11 +267,6 @@ def main():
         layout="centered",
     )
     
-    
-    def main():
-    apply_custom_css()
-    
-
     # Sidebar
     with st.sidebar:
         openai_api_key = st.text_input('Your OpenAI API KEY', type="password")
