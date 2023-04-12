@@ -1,4 +1,3 @@
-import databutton as db
 from collections import deque
 from typing import Dict, List, Optional
 from langchain import LLMChain, OpenAI, PromptTemplate
