@@ -1,4 +1,3 @@
-# Importación de librerías
 from collections import deque
 from typing import Dict, List, Optional
 from langchain import LLMChain, OpenAI, PromptTemplate
@@ -9,34 +8,20 @@ from langchain.vectorstores.base import VectorStore
 from pydantic import BaseModel, Field
 import streamlit as st
 
-def apply_custom_css():
-    custom_css = """
-        <style>
-            body {
-                background-color: #FFA500;
-            }
-            .sidebar .sidebar-content {
-                background-color: #8B4513;
-            }
-        </style>
-    """
-    st.markdown(custom_css, unsafe_allow_html=True)
-
-# Clases principales
 class TaskCreationChain(LLMChain):
     @classmethod
     def from_llm(cls, llm: BaseLLM, objective: str, verbose: bool = True) -> LLMChain:
         """Get the response parser."""
-        task_creation_template = """
-            You are an task creation AI that uses the result of an execution agent
-            to create new tasks with the following objective: {objective},
-            The last completed task has the result: {result}.
-            This result was based on this task description: {task_description}.
-            These are incomplete tasks: {incomplete_tasks}.
-            Based on the result, create new tasks to be completed
-            by the AI system that do not overlap with incomplete tasks.
-            Return the tasks as an array.
-        """.strip()
+        task_creation_template = (
+            "You are an task creation AI that uses the result of an execution agent"
+            " to create new tasks with the following objective: {objective},"
+            " The last completed task has the result: {result}."
+            " This result was based on this task description: {task_description}."
+            " These are incomplete tasks: {incomplete_tasks}."
+            " Based on the result, create new tasks to be completed"
+            " by the AI system that do not overlap with incomplete tasks."
+            " Return the tasks as an array."
+        )
         prompt = PromptTemplate(
             template=task_creation_template,
             partial_variables={"objective": objective},
@@ -58,15 +43,15 @@ class TaskPrioritizationChain(LLMChain):
     @classmethod
     def from_llm(cls, llm: BaseLLM, objective: str, verbose: bool = True) -> LLMChain:
         """Get the response parser."""
-        task_prioritization_template = """
-            You are an task prioritization AI tasked with cleaning the formatting of and reprioritizing
-            the following tasks: {task_names}.
-            Consider the ultimate objective of your team: {objective}.
-            Do not remove any tasks. Return the result as a numbered list, like:
-            #. First task
-            #. Second task
-            Start the task list with number {next_task_id}."
-        """.strip()
+        task_prioritization_template = (
+            "You are an task prioritization AI tasked with cleaning the formatting of and reprioritizing"
+            " the following tasks: {task_names}."
+            " Consider the ultimate objective of your team: {objective}."
+            " Do not remove any tasks. Return the result as a numbered list, like:"
+            " #. First task"
+            " #. Second task"
+            " Start the task list with number {next_task_id}."
+        )
         prompt = PromptTemplate(
             template=task_prioritization_template,
             partial_variables={"objective": objective},
@@ -91,7 +76,7 @@ class TaskPrioritizationChain(LLMChain):
                 prioritized_task_list.append({"task_id": task_id, "task_name": task_name})
         return prioritized_task_list
 
-
+        
 class ExecutionChain(LLMChain):
     """Chain to execute tasks."""
     
@@ -100,12 +85,12 @@ class ExecutionChain(LLMChain):
     @classmethod
     def from_llm(cls, llm: BaseLLM, vectorstore: VectorStore, verbose: bool = True) -> LLMChain:
         """Get the response parser."""
-        execution_template = """
-            You are an AI who performs one task based on the following objective: {objective}.
-            Take into account these previously completed tasks: {context}.
-            Your task: {task}.
-            Response:
-        """.strip()
+        execution_template = (
+            "You are an AI who performs one task based on the following objective: {objective}."
+            " Take into account these previously completed tasks: {context}."
+            " Your task: {task}."
+            " Response:"
+        )
         prompt = PromptTemplate(
             template=execution_template,
             input_variables=["objective", "context", "task"],
@@ -145,7 +130,6 @@ class Message:
 
     def write(self, content):
         self.exp.markdown(content)
-
 
 
 class BabyAGI(BaseModel):
@@ -238,8 +222,8 @@ class BabyAGI(BaseModel):
         objective: str,
         first_task: str,
         verbose: bool = False,
-    ) -> "AGI":
-        """Initialize the AGI Controller."""
+    ) -> "BabyAGI":
+        """Initialize the BabyAGI Controller."""
         task_creation_chain = TaskCreationChain.from_llm(
             llm, objective, verbose=verbose
         )
@@ -256,44 +240,30 @@ class BabyAGI(BaseModel):
         controller.add_task({"task_id": 1, "task_name": first_task})
         return controller
 
-    
+
 def main():
-    # Configuración de Streamlit
     st.set_page_config(
         initial_sidebar_state="expanded",
-        page_title="AGI UI",
+        page_title="BabyAGI Streamlit",
         layout="centered",
     )
 
-    apply_custom_css()
-    
-    # Sidebar
     with st.sidebar:
         openai_api_key = st.text_input('Your OpenAI API KEY', type="password")
-        model_name = st.selectbox("Model name", options=["gpt-3.5-turbo", "gpt-4", "text-davinci-003"])
-        temperature = st.slider(
-            label="Temperature",
-            min_value=0.0,
-            max_value=1.0,
-            step=0.1,
-            value=0.5,
-        )
 
-    # UI principal
+    st.title("BabyAGI Streamlit")
     objective = st.text_input("Input Ultimate goal", "Solve world hunger")
     first_task = st.text_input("Input Where to start", "Develop a task list")
     max_iterations = st.number_input("Max iterations", value=3, min_value=1, step=1)
     button = st.button("Run")
 
-    # Creación de modelos
     embedding_model = HuggingFaceEmbeddings()
     vectorstore = FAISS.from_texts(["_"], embedding_model, metadatas=[{"task":first_task}])
 
-    # Ejecución del BabyAGI
     if button:
         try:
             baby_agi = BabyAGI.from_llm_and_objectives(
-                llm=OpenAI(openai_api_key=openai_api_key, temperature=temperature, model_name=model_name),
+                llm=OpenAI(openai_api_key=openai_api_key),
                 vectorstore=vectorstore,
                 objective=objective,
                 first_task=first_task,
@@ -303,6 +273,6 @@ def main():
         except Exception as e:
             st.error(e)
 
-# Ejecución del programa
+
 if __name__ == "__main__":
     main()
